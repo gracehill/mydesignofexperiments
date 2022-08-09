@@ -1,0 +1,71 @@
+cashdata = read.table("http://users.stat.ufl.edu/~rrandles/sta4210/Rclassnotes/data/textdatasets/KutnerData/Chapter%2019%20Data%20Sets/CH19PR10.txt")
+age = factor(cashdata$V2, levels = 1:3)
+levels(age) = c("young", "middle", "elderly")
+
+gender = factor(cashdata$V3, levels = 1:2)
+levels(gender) = c("male", "female")
+age_gend_data = data.frame(offer=cashdata$V1, age, gender)
+
+aov.1 <- aov(offer ~ age + gender, data = age_gend_data)
+data.fit = fitted(aov.1)
+data.fit
+
+
+residuals = resid(aov.1)
+residuals
+
+age_gend_data$residuals <- residuals
+
+male_young <- subset(age_gend_data , age == "young" | gender == "male")
+sum(male_young$residuals)
+
+male_middle  <- subset(age_gend_data , age == "middle" | gender == "male")
+sum(male_middle$residuals)
+
+male_elderly <- subset(age_gend_data , age == "elderly" | gender == "male")
+sum(male_elderly$residuals)
+
+female_young <- subset(age_gend_data , age == "young" | gender == "female")
+sum(female_young$residuals)
+
+female_middle <-  subset(age_gend_data , age == "middle" | gender == "female")
+sum(female_middle$residuals)
+
+female_elderly <- subset(age_gend_data , age == "elderly" | gender == "female")
+sum(female_elderly$residuals)
+
+#aligned residual dot plot
+library(ggplot2)
+ggplot(data = age_gend_data, mapping = aes(x = age  , y = residuals, color = age)) +
+  geom_point() +
+  facet_wrap(~gender)
+  
+qqnorm(residuals)
+qqline(residuals)
+qqplot = qqnorm(residuals)
+
+cor(qqplot$x, qqplot$y)
+
+plot(residuals, cashdata$V4)
+
+#estimated treatment means plot
+fitted(aov.1)
+estimated_means <- c(21.889, 21.111, 28.139, 27.361, 21.806, 21.028)
+ages <- c("young", "middle", "elderly", "young", "middle", "elderly")
+genders <- c("male", "male", "male", "female", "female", "female")
+df <- data.frame(ages, genders, estimated_means)
+df
+
+library(ggplot2)
+ggplot(data = df, aes(x = ages , y = estimated_means, group = genders, color=genders)) +
+  geom_line()+
+  geom_point()
+  
+ aov.1
+ summary(aov.1)
+ 
+interaction_model = aov(offer ~ age*gender, data=age_gend_data)
+summary(interaction_model)
+qf(0.95, 2, 29)
+
+fitted(aov.1)

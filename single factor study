@@ -1,0 +1,42 @@
+hw2dat <- read.delim("~/hw2dat.txt", header=FALSE)
+View(hw2dat)
+colnames(hw2dat)=c("age", "offer")
+hw2dat$age = factor(hw2dat$age)
+
+stripchart(offer~age, data=hw2dat, method="stack", vertical=TRUE, 
+           pch=1, cex=1.5, xlab="Age", ylab="Size of Offer (in hundred dollars)"
+         , main="Dotplots by Age") 
+        
+means=tapply(hw2dat$offer, hw2dat$age, mean)
+means
+
+young_subset <- hw2dat[1:12, ]
+young_mean <- sum(young_subset$offer)/12
+
+middle_subset <- hw2dat[13:24,]
+middle_mean <- sum(middle_subset$offer)/12
+
+elderly_subset <- hw2dat[25:36, ]
+elderly_mean  <- sum(elderly_subset$offer)/12
+
+elderly_residuals <- sum(elderly_subset$offer - elderly_mean)
+young_residuals <- sum(young_subset$offer - young_mean)
+middle_residuals <- sum(middle_subset$offer - middle_mean)
+
+total_mean <- mean(hw2dat$offer)
+young_total_res <- sum(young_subset$offer - total_mean)
+middle_total_res <- sum(middle_subset$offer - total_mean)
+elderly_total_res <- sum(elderly_subset$offer - total_mean)
+
+anova=aov(offer~age, data=hw2dat)
+summary(anova)
+
+anova=aov(offer~age, data=hw2dat)
+summary(anova)
+
+f.crit <- qf(.99,2,33)
+
+alpha.1 <- c(-3, -2, 1, 3, 1)
+power.anova.test(groups = length(alpha.1),
+                 between.var = var(alpha.1),
+                 within.var = 10^2, power = .95)

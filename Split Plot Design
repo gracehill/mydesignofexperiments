@@ -1,0 +1,4 @@
+wheat.data = read.table(
+wheat.data$field = factor(wheat.data$field)
+wheat.data$irrigation = factor(wheat.data$irrigation)
+wheat.data$fertilizer= factor(wheat.data$fertilizer)

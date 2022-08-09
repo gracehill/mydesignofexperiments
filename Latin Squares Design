@@ -1,0 +1,37 @@
+helpfulness_data = read.table("http://users.stat.ufl.edu/~rrandles/sta4210/Rclassnotes/data/textdatasets)
+colnames(helpfulness_data) <- c("score", "executive", "month", "report")
+helpfulness_data$executive = factor(helpfulness_data$executive)
+helpfulness_data$month = factor(helpfulness_data$month)
+helpfulness_data$report = factor(helpfulness_data$report)
+
+helpful.rbd2 = aov(score ~ executive + month + report, data = helpfulness_data)
+residuals = resid(helpful.rbd2)
+residuals
+
+#There is almost no correlation between residuals and fitted values. Month and executive are fixed, while
+report type is random. Because each block has 5 levels with one observation each and model assumptions
+are met, latin squares model is appropriate.
+
+plot(helpful.rbd2)
+
+fithelp <- fitted(helpful.rbd2)
+rvf = lm(residuals ~ fithelp)
+cor(residuals, fithelp)
+
+plot(fithelp, residuals)
+abline(rvf)
+
+summary(helpful.rbd2)
+
+scoremodel <- aov(score ~ executive + report, data = helpfulness_data)
+interaction.plot(helpfulness_data$executive,helpfulness_data$report, helpfulness_data$score)
+#month is not significant
+
+reportanova = aov(score ~ report, data = helpfulness_data)
+summary(reportanova)
+
+helpful.Tukey=TukeyHSD(scoremodel,"report",conf.level=0.99)
+print(helpful.Tukey)
+#There is a significant difference in score between reports between 3-1, 4-1, 5-1, 3-2, 4-2, 5-2, and 4-3.
+
+plot(helpful.Tukey)

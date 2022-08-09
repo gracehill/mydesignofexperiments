@@ -1,4 +1,56 @@
-wheat.data = read.table(
+wheat.data = read.table("https://raw.githubusercontent.com/gracehill/mydesignofexperiments/main/wheat%20data%20raw")
 wheat.data$field = factor(wheat.data$field)
 wheat.data$irrigation = factor(wheat.data$irrigation)
 wheat.data$fertilizer= factor(wheat.data$fertilizer)
+
+#creating anova table
+wheat.mod = aov(yield ~ irrigation*fertilizer + Error(field:irrigation), data=wheat.data)
+summary(wheat.mod)
+
+library(ggplot2)
+ggplot(aes(x = irrigation, y = yield, group = fertilizer, colour = field), data = wheat.data) +
+geom_line() +
+facet_wrap(~ field)+
+geom_point(size=2)
+
+MSAB=0.05
+MSSPE= 1.50
+TS.AB = MSAB/MSSPE
+p.ab=pf(TS.AB,1,8,lower.tail = FALSE)
+p.ab
+
+MSA=1394.5
+MSWPE=104.7
+TS.A= MSA/MSWPE
+p.a = pf(TS.A,1,8,lower.tail = FALSE)
+p.a
+
+
+MSB= 68.45
+TS.B= MSB/MSSPE
+p.b = pf(TS.B,1,8,lower.tail = FALSE)
+p.b
+
+#comparing irrigation means
+irrigation.1 = subset(wheat.data, irrigation == "1")
+irrigation.2 = subset(wheat.data, irrigation == "2")
+estimate.a = mean(irrigation.1$yield) - mean(irrigation.2$yield)
+crit.a = qt(0.95,8)
+se.a = sqrt(MSWPE/5)
+l.a = estimate.a - crit.a*se.a
+u.a = estimate.a + crit.a*se.a
+ci.a = cbind(l.a,u.a)
+ci.a
+
+
+#comparing fertilizer means
+fertilizer.1 = subset(wheat.data, fertilizer== "1")
+fertilizer.2 = subset(wheat.data, fertilizer == "2")
+estimate.b = mean(fertilizer.1$yield) - mean(fertilizer.2$yield)
+crit.b = qt(0.95,18)
+se.b = sqrt(MSSPE/10)
+l.b = estimate.b - crit.b*se.b
+u.b = estimate.b + crit.b*se.b
+ci.b = cbind(l.b,u.b)
+ci.b
+
